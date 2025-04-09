@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { models } from '@/data/models';
 import { ChatSession, ChatMessage } from '@/types/models';
+import { sendMessage as sendChatMessage } from '../services/chatService';
 import { ChatSidebar } from './ui/chat/ChatSidebar';
 import { ModelSelector } from './ui/chat/ModelSelector';
 import { SecondaryModelSelector } from './ui/chat/SecondaryModelSelector';
@@ -12,9 +13,10 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { UserProfile } from './ui/UserProfile';
 import { useAuth } from '@/contexts/AuthContext';
-import { fetchUserChats, createChatSession, sendMessage, deleteChat } from '@/services/chatService';
+import { fetchUserChats, createChatSession, deleteChat } from '@/services/chatService';
 import { useNavigate } from 'react-router-dom';
 import { toast } from './ui/use-toast';
+import { ModelType } from '../types/models';
 
 export function ChatLayout() {
   const [chats, setChats] = useState<ChatSession[]>([]);
@@ -113,54 +115,41 @@ export function ChatLayout() {
   
   const handleSendMessage = async (content: string) => {
     if (!activeChatId) return;
-    
     setLoading(true);
-    
+
     try {
-      const result = await sendMessage(
-        activeChatId, 
-        content, 
-        selectedModels.slice(0, splitView ? 2 : 1)
-      );
+      const result = await sendChatMessage(activeChatId, content, selectedModels);
       
       if (result) {
         const { userMessage, assistantResponses } = result;
         
-        setChats(prevChats => {
-          return prevChats.map(chat => {
-            if (chat.id === activeChatId) {
-              return {
-                ...chat,
-                messages: [
-                  ...chat.messages, 
-                  userMessage, 
-                  ...assistantResponses
-                ],
-                lastMessageDate: Date.now(),
-                models: selectedModels.slice(0, splitView ? 2 : 1)
-              };
-            }
-            return chat;
-          });
-        });
+        // Update chat in state
+        setChats(prevChats =>
+          prevChats.map(chat =>
+            chat.id === activeChatId
+              ? {
+                  ...chat,
+                  messages: [...chat.messages, userMessage, ...assistantResponses],
+                  lastMessageDate: Date.now()
+                }
+              : chat
+          )
+        );
       } else {
-        toast({
-          title: "Error",
-          description: "Failed to send message.",
-          variant: "destructive",
-        });
+        throw new Error('Failed to send message');
       }
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send message.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+
+  } catch (error) {
+    console.error('Error sending message:', error);
+    toast({
+      title: "Error",
+      description: "An error occurred while sending your message.",
+      variant: "destructive",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Handle chat deletion
   const handleDeleteChat = async (chatId: string) => {
@@ -206,7 +195,7 @@ export function ChatLayout() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
       <ChatSidebar 
         chats={chats}
         activeChat={activeChatId}
@@ -216,7 +205,7 @@ export function ChatLayout() {
       />
       
       <main className="flex-1 flex flex-col overflow-hidden">
-        <div className="border-b border-border p-4 flex items-center justify-between">
+        <div className="border-b border-border p-2 flex items-center justify-between bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex-1">
             <ModelSelector 
               models={models} 
@@ -235,8 +224,6 @@ export function ChatLayout() {
               />
             )}
           </div>
-          
-          {/* <UserProfile /> */}
         </div>
         
         {activeChat ? (
@@ -257,7 +244,7 @@ export function ChatLayout() {
                 ))}
                 
                 {loading && !splitView && (
-                  <div className="py-6 px-4 flex gap-4">
+                  <div className="py-4 px-4 flex gap-4">
                     <div className="flex-shrink-0">
                       <div className="h-8 w-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
                         <div className="typing-indicator">
@@ -284,7 +271,7 @@ export function ChatLayout() {
                   ))}
                   
                   {loading && splitView && (
-                    <div className="py-6 px-4 flex gap-4">
+                    <div className="py-4 px-4 flex gap-4">
                       <div className="flex-shrink-0">
                         <div className="h-8 w-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
                           <div className="typing-indicator">

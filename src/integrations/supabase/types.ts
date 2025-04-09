@@ -49,6 +49,7 @@ export type Database = {
           created_at: string
           id: string
           last_message_date: string
+          messages: Json
           title: string
           updated_at: string
           user_id: string
@@ -57,6 +58,7 @@ export type Database = {
           created_at?: string
           id?: string
           last_message_date?: string
+          messages?: Json
           title: string
           updated_at?: string
           user_id: string
@@ -65,6 +67,7 @@ export type Database = {
           created_at?: string
           id?: string
           last_message_date?: string
+          messages?: Json
           title?: string
           updated_at?: string
           user_id?: string

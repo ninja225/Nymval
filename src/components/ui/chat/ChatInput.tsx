@@ -28,15 +28,15 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
   };
   
   return (
-    <div className="w-full p-4 border-t border-border input-gradient">
-      <div className="flex gap-2 items-end max-w-4xl mx-auto relative">
+    <div className="w-full p-1 border-t border-border input-gradient">
+      <div className="flex gap-1 items-end max-w-4xl mx-auto relative">
         <Textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Message the AI..."
           className={cn(
-            "resize-none min-h-[60px] pr-12 bg-secondary/80 border-primary/20",
+            "resize-none min-h-[40px] pr-12 bg-secondary/80 border-primary/20",
             isLoading && "opacity-50"
           )}
           disabled={isLoading}

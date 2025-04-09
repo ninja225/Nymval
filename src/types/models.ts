@@ -3,8 +3,9 @@ export type ModelType = {
   id: string;
   name: string;
   provider: string;
+  modelId: string;
+  maxTokens: number;
   description?: string;
-  maxTokens?: number;
 }
 
 export type ChatMessage = {

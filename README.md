@@ -56,7 +56,7 @@ Nymval AI is a modern chat application designed to provide an exceptional real-t
 
 ### Frontend
 
-| Technology          | Description                        | Icon                                                                                                                                                                  |
+| Technology          | Description                        | Link                                                                                                                                                                  |
 | ------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **React 18**        | Component-based UI library         | [![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://reactjs.org/)                                            |
 | **TypeScript**      | Type safety and better DX          | [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)                  |
@@ -123,6 +123,36 @@ yarn dev
 ```
 
 The application will be available at `http://localhost:8080`
+
+## Type Checking
+
+Run TypeScript type checking:
+
+```bash
+# Check types
+npm
+npm run type-check
+
+# Watch mode for type checking during development
+npm run type-check:watch
+
+# If you encounter issues with the commands above, try updating TypeScript and Node.js type definitions by running the following:
+
+npm install --save-dev typescript@latest @types/node@latest
+```
+
+## Error Handling
+
+To check for TypeScript errors:
+
+1. Run the type checker:
+
+```bash
+npm run type-check
+```
+
+2. Look for any red squiggly lines in VS Code
+3. Use the Problems panel (Ctrl+Shift+M) to view all TypeScript errors
 
 ## Deployment on Netlify
 

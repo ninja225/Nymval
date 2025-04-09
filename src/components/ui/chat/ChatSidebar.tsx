@@ -1,10 +1,12 @@
 
 import { useState } from 'react';
-import { PlusCircle, Search, Trash2 } from 'lucide-react';
+import { PlusCircle, Search, Pencil, Trash2, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ChatSession } from '@/types/models';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/use-toast';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +30,8 @@ interface ChatSidebarProps {
 export function ChatSidebar({ chats, activeChat, onSelectChat, onNewChat, onDeleteChat }: ChatSidebarProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
+  const [editingChatId, setEditingChatId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState('');
 
   const filteredChats = chats.filter(chat => 
     chat.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -49,6 +53,47 @@ export function ChatSidebar({ chats, activeChat, onSelectChat, onNewChat, onDele
     }
     
     return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  };
+
+  const handleUpdateTitle = async (chatId: string, newTitle: string) => {
+    if (!newTitle.trim()) {
+      toast({
+        title: "Error",
+        description: "Title cannot be empty",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('chat_sessions')
+        .update({ title: newTitle.trim() })
+        .eq('id', chatId);
+
+      if (error) throw error;
+
+      // Update local state by creating a new array with the updated chat
+      const updatedChats = chats.map(chat =>
+        chat.id === chatId ? { ...chat, title: newTitle.trim() } : chat
+      );
+      
+      // Pass the updated chats array to the parent component
+      onSelectChat(chatId);
+      
+      setEditingChatId(null);
+      toast({
+        title: "Success",
+        description: "Chat title updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating chat title:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update chat title",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDeleteChat = (chatId: string) => {
@@ -99,10 +144,58 @@ export function ChatSidebar({ chats, activeChat, onSelectChat, onNewChat, onDele
               className="w-full text-left"
             >
               <div className="flex justify-between items-start">
-                <h3 className="font-medium truncate text-sm flex-1">{chat.title}</h3>
-                <span className="text-xs text-muted-foreground ml-2 whitespace-nowrap">
-                  {formatDate(chat.lastMessageDate)}
-                </span>
+                {editingChatId === chat.id ? (
+                  <div className="flex items-center gap-1 flex-1">
+                    <Input
+                      value={editingTitle}
+                      onChange={(e) => setEditingTitle(e.target.value)}
+                      className="h-6 text-sm"
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleUpdateTitle(chat.id, editingTitle);
+                        } else if (e.key === 'Escape') {
+                          setEditingChatId(null);
+                        }
+                      }}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => handleUpdateTitle(chat.id, editingTitle)}
+                    >
+                      <Check className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => setEditingChatId(null)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <h3 className="font-medium truncate text-sm flex-1">{chat.title}</h3>
+                    <div className="flex items-center gap-1">
+                      <button
+                        className="p-1 rounded-full opacity-0 group-hover:opacity-100 hover:bg-background/90"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingChatId(chat.id);
+                          setEditingTitle(chat.title);
+                        }}
+                      >
+                        <Pencil size={14} className="text-muted-foreground hover:text-foreground" />
+                      </button>
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
+                        {formatDate(chat.lastMessageDate)}
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
               <p className="text-xs text-muted-foreground mt-1 truncate">
                 {chat.messages[chat.messages.length - 1]?.content.slice(0, 50)}...
@@ -113,7 +206,7 @@ export function ChatSidebar({ chats, activeChat, onSelectChat, onNewChat, onDele
               <AlertDialog open={chatToDelete === chat.id} onOpenChange={(open) => !open && setChatToDelete(null)}>
                 <AlertDialogTrigger asChild>
                   <button 
-                    className="absolute right-2 top-2 p-1 rounded-full opacity-0 group-hover:opacity-100 hover:bg-background/90"
+                    className="absolute right-2 bottom-2 p-1 rounded-full opacity-0 group-hover:opacity-100 hover:bg-background/90"
                     onClick={(e) => {
                       e.stopPropagation();
                       setChatToDelete(chat.id);

@@ -20,7 +20,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <div className="flex min-h-screen flex-col">
-            <header className="border-b">
+            <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
               <div className="container flex h-16 items-center justify-between">
                 <a href="/">
                   <div className="flex items-center gap-4">
@@ -38,7 +38,6 @@ const App = () => (
                     <span className="ml-2">AI</span>
                   </a>
                 </div>
-                
                 <div className="flex items-center gap-4">
                   <ProfileMenu />
                 </div>

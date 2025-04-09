@@ -1,47 +1,61 @@
-
 import { ModelType } from '../types/models';
 
 export const models: ModelType[] = [
   {
-    id: "gemini-pro-2.5",
+    id: "gemini-pro-25",
     name: "Gemini 2.5 Pro",
     provider: "Google",
-    description: "Capable of advanced reasoning and content generation",
+    modelId: "google/gemini-pro",
     maxTokens: 32768,
+    description: "Most capable Gemini model for highly complex tasks"
   },
   {
-    id: "deepseek-coder",
-    name: "DeepSeek Coder",
-    provider: "DeepSeek",
-    description: "Specialized in code generation and technical contexts",
-    maxTokens: 16384,
-  },
-  {
-    id: "llama3-70b",
-    name: "Llama 3 70B",
+    id: "llama4-maverick",
+    name: "Llama 4 Maverick",
     provider: "Meta",
-    description: "Meta's flagship model with strong general capabilities",
-    maxTokens: 8192,
-  },
-  {
-    id: "qwen-72b",
-    name: "Qwen 72B",
-    provider: "Alibaba",
-    description: "Versatile model with robust reasoning abilities",
-    maxTokens: 8192,
-  },
-  {
-    id: "claude-3-opus",
-    name: "Claude 3 Opus",
-    provider: "Anthropic",
-    description: "Top-tier model with exceptional reasoning and instruction following",
-    maxTokens: 200000,
-  },
-  {
-    id: "mixtral-8x7b",
-    name: "Mixtral 8x7B",
-    provider: "Mistral AI",
-    description: "Mixture of experts model with efficient performance",
+    modelId: "meta-llama/llama-4-maverick:free",
     maxTokens: 32768,
-  }
+    description: "Advanced Llama model for complex reasoning"
+  },
+  {
+    id: "llama4-scout",
+    name: "Llama 4 Scout",
+    provider: "Meta",
+    modelId: "meta-llama/llama-4-scout:free",
+    maxTokens: 32768,
+    description: "Efficient Llama model for general tasks"
+  },
+  {
+    id: "qwen25-vl",
+    name: "Qwen2.5 VL 3B",
+    provider: "Alibaba",
+    modelId: "qwen/qwen2.5-vl-3b-instruct:free",
+    maxTokens: 16384,
+    description: "Multimodal model with vision capabilities"
+  },
+  {
+    id: "deepseek-v3",
+    name: "DeepSeek V3",
+    provider: "DeepSeek",
+    modelId: "deepseek/deepseek-chat-v3-0324:free",
+    maxTokens: 32768,
+    description: "Advanced model for diverse tasks"
+  },
+  // Add More Models Here
+  // {
+  //   id: "claude-37-sonnet",
+  //   name: "Claude 3.7 Sonnet",
+  //   provider: "Anthropic",
+  //   modelId: "anthropic/claude-3.7-sonnet",
+  //   maxTokens: 200000,
+  //   description: "Powerful Claude model for complex tasks"
+  // },
+  // {
+  //   id: "claude-35-haiku",
+  //   name: "Claude 3.5 Haiku",
+  //   provider: "Anthropic",
+  //   modelId: "anthropic/claude-3.5-haiku",
+  //   maxTokens: 200000,
+  //   description: "Fast and efficient Claude model"
+  // }
 ];

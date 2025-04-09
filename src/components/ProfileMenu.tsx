@@ -1,6 +1,7 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from '@/integrations/supabase/client';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,14 +24,21 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, User, Trash2, Save } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { uploadAvatar } from "@/services/storageService";
 
 export function ProfileMenu() {
   const { user, signOut, updateProfile } = useAuth();
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
-  const [fullName, setFullName] = useState(user?.user_metadata?.full_name || "");
-  const [avatarUrl, setAvatarUrl] = useState(user?.user_metadata?.avatar_url || "");
+  const [fullName, setFullName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setFullName(user.user_metadata?.full_name || "");
+      setAvatarUrl(user.user_metadata?.avatar_url || "");
+    }
+  }, [user]);
   
   if (!user) return null;
   
@@ -43,27 +51,16 @@ export function ProfileMenu() {
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const file = e.target.files?.[0];
-      if (!file) return;
-      
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${user.id}/${Date.now()}.${fileExt}`;
+      if (!file || !user) return;
       
       setIsLoading(true);
       
-      // Upload the file to Supabase storage
-      const { error: uploadError, data } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file);
+      // Upload avatar using storage service
+      const publicUrl = await uploadAvatar(user.id, file);
       
-      if (uploadError) throw uploadError;
-      
-      // Get the public URL
-      const { data: urlData } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-        
-      // Set the avatar URL
-      setAvatarUrl(urlData.publicUrl);
+      // Update avatar URL in both state and profile
+      setAvatarUrl(publicUrl);
+      await updateProfile({ avatar_url: publicUrl });
       
       toast({
         title: "Avatar uploaded",
@@ -73,7 +70,7 @@ export function ProfileMenu() {
       console.error('Error uploading avatar:', error);
       toast({
         title: "Error",
-        description: "Failed to upload avatar. Please try again.",
+        description: "Failed to upload avatar. Please ensure the file is an image and try again.",
         variant: "destructive",
       });
     } finally {
@@ -112,6 +109,9 @@ export function ProfileMenu() {
         title: "Chats cleared",
         description: "All your chat history has been cleared.",
       });
+
+      // Refresh the page after successful deletion
+      window.location.reload();
     } catch (error) {
       console.error('Error clearing chats:', error);
       toast({
