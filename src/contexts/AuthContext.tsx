@@ -64,28 +64,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (provider: 'github' | 'discord') => {
     try {
       console.log(`Initiating sign in with ${provider}`);
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: `${window.location.origin}/`,
+          scopes: provider === 'github' ? 'read:user user:email' : 'identify email',
           queryParams: {
-            // Adding state parameter to track redirect properly
-            state: JSON.stringify({ redirectFrom: 'auth', timestamp: Date.now() })
+            state: JSON.stringify({ 
+              redirectFrom: 'auth', 
+              timestamp: Date.now(),
+              provider
+            })
           }
         }
       });
-      
+
       if (error) {
-        console.error(`Error during ${provider} sign in:`, error);
         throw error;
       }
-      
-      console.log(`${provider} auth flow initiated successfully`);
+
+      // Log the redirect URL for debugging
+      console.log('Auth redirect URL:', data?.url);
     } catch (error) {
       console.error(`Error signing in with ${provider}:`, error);
       toast({
-        title: "Error",
-        description: `Failed to sign in with ${provider}. Please try again.`,
+        title: "Authentication Error",
+        description: "Failed to initialize authentication. Please try again.",
         variant: "destructive",
       });
     }

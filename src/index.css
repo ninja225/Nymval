@@ -40,6 +40,12 @@
     @apply bg-background text-foreground;
     font-family: "Inter", system-ui, sans-serif;
   }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    body ::-webkit-scrollbar {
+      display: none;
+    }
 }
 
 @layer components {
