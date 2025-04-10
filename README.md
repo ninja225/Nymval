@@ -72,13 +72,13 @@ Nymval AI is a modern chat application designed to provide an exceptional real-t
 
 ### Backend & Services
 
-| Technology   | Description                 | Icon                                                                                                                                  |
+| Technology   | Description                 | Link                                                                                                                                  |
 | ------------ | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | **Supabase** | Backend as a Service (BaaS) | [![Supabase](https://img.shields.io/badge/-Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/) |
 
 ### Other Tools
 
-| Technology  | Description              | Icon                                                                                                                                  |
+| Technology  | Description              | Link                                                                                                                                  |
 | ----------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
 | **ESLint**  | Linting and code quality | [![ESLint](https://img.shields.io/badge/-ESLint-4B32C3?style=for-the-badge&logo=eslint&logoColor=white)](https://eslint.org/)         |
 | **PostCSS** | CSS processing           | [![PostCSS](https://img.shields.io/badge/-PostCSS-DD3A0A?style=for-the-badge&logo=postcss&logoColor=white)](https://postcss.org/)     |
